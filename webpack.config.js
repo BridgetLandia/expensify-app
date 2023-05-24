@@ -27,9 +27,25 @@ module.exports = (env) => {
         exclude: /node_modules/
       }, {
         test: /\.s?css$/,
-          use: [ExtractTextPlugin.loader,  'css-loader',
-            'sass-loader']
-      }]
+        use: [
+          {
+            loader: ExtractTextPlugin.loader
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true
+            }
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true
+            }
+          }
+        ]
+      }
+      ]
     },
     plugins: [
       CSSExtract,
