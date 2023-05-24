@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const ExtractTextPlugin = require('mini-css-extract-plugin');
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'test') {
 
 module.exports = (env) => {
   const isProduction = env === 'production';
-  const CSSExtract = new ExtractTextPlugin('styles.css');
+  const CSSExtract = new ExtractTextPlugin({filename: 'styles.css'});
 
   return {
     entry: './src/app.js',
@@ -27,22 +27,8 @@ module.exports = (env) => {
         exclude: /node_modules/
       }, {
         test: /\.s?css$/,
-        use: CSSExtract.extract({
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                sourceMap: true
-              }
-            },
-            {
-              loader: 'sass-loader',
-              options: {
-                sourceMap: true
-              }
-            }
-          ]
-        })
+          use: [ExtractTextPlugin.loader,  'css-loader',
+            'sass-loader']
       }]
     },
     plugins: [
@@ -58,9 +44,13 @@ module.exports = (env) => {
     ],
     devtool: isProduction ? 'source-map' : 'inline-source-map',
     devServer: {
-      contentBase: path.join(__dirname, 'public'),
+      static: path.join(__dirname, 'public'),
+      devMiddleware: {
+        publicPath: '/dist/'
+      },
       historyApiFallback: true,
-      publicPath: '/dist/'
+      port: 3000,
+      hot: "only"
     }
   };
 };
